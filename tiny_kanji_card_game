@@ -1,0 +1,29 @@
+import pygame  # import the library
+pygame.init()  # initialize pygame
+
+# --- Settings ---
+WIDTH = 800
+HEIGHT = 600
+
+# Create a window
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Tiny Card Game")
+
+# Main loop
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:  # clicking the X closes the window
+            running = False
+
+    screen.fill((255, 255, 255))  # fill the screen with white
+
+    # Draw one card
+    card_rect = pygame.Rect(100, 400, 80, 120)  # x, y, width, height
+    pygame.draw.rect(screen, (180, 180, 180), card_rect)  # gray rectangle
+    pygame.draw.rect(screen, (0, 0, 0), card_rect, 2)      # black border
+
+
+    pygame.display.flip()  # update the screen (otherwise what we draw appears only in memory,not on the screen)
+
+pygame.quit()
