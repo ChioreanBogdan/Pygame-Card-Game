@@ -7,82 +7,35 @@ from kanji_database import KANJI_DB
 from player import Player #import Player class
 from turn_manager import TurnManager #import TurnManager
 from renderer import Renderer
+from board import Board
 
-pygame.init()  # initialize pygame
+pygame.init()  # initialize pygamefrom board import Board
+
+print("testing")
 
 kanji_font = pygame.font.SysFont("MS Gothic", 48)  # None = default font, 48 = size
 ui_font = pygame.font.SysFont("Arial", 28)
 
-#Import turn manager
+#Create turn manager object
 turn_manager = TurnManager()
 
 # --- Settings ---
 WIDTH = 800
 HEIGHT = 600
 
+#Create board object
+board = Board(WIDTH,HEIGHT)
+
 #Made End Turn button rect
 end_turn_rect = pygame.Rect(WIDTH - 220, HEIGHT // 2 - 30, 140, 60)
 
-# Portrait size (width and height in pixels)
-# Used for enemy and Player portraits
-PORTRAIT_WIDTH = 140
-PORTRAIT_HEIGHT = 140
-
 # Create a window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+# Name of window
 pygame.display.set_caption("Tiny Card Game")
 
 #Create renderer object,this handles graphics
-renderer = Renderer(screen)
-
-# Player field slots (bottom of the screen)
-player_slots = []
-enemy_slots = []
-slot_width = 80
-slot_height = 120
-slot_margin = 20
-start_x = 50
-
-#create rectangles for player and enemy slots
-y = HEIGHT - 300  # some distance above the player portrait
-
-for i in range(5):  # 5 slots
-    x = start_x + i * (slot_width + slot_margin)
-    new_player_slot= Slot(pygame.Rect(x, y, slot_width, slot_height),None)
-    player_slots.append(new_player_slot)
-
-y = 150  # below the enemy portrait
-for i in range(5):
-    x = start_x + i * (slot_width + slot_margin)
-    new_enemy_slot=Slot(pygame.Rect(x, y, slot_width, slot_height),None)
-    enemy_slots.append(new_enemy_slot)
-
-
-    # Create enemy portrait rectangle (top right)
-
-enemy_rect = pygame.Rect(WIDTH - PORTRAIT_WIDTH - 30, 40, PORTRAIT_WIDTH, PORTRAIT_HEIGHT)
-                                  # X position:
-                                  # Start at right edge (WIDTH),
-                                  # move left by portrait width,
-                                  # then move left 30 more pixels (margin)
-                               # Y position:
-                                  # 40 pixels from the top
-    
-                  # rectangle width
-                   # rectangle height
-
-
-# Create player portrait rectangle (bottom right)
-
-player_rect = pygame.Rect(WIDTH - PORTRAIT_WIDTH - 30, HEIGHT - PORTRAIT_HEIGHT - 40,     PORTRAIT_WIDTH,PORTRAIT_HEIGHT)
-                          # Same X position as enemy
-    
-                            # Y position:
-                                     # Start at bottom (HEIGHT),
-                                     # move up by portrait height,
-                                     # move up 40 more pixels (margin)
-#create a rectangle for the deck
-deck_rect = pygame.Rect(WIDTH-250, HEIGHT - 180, 80, 120)
+renderer = Renderer(screen, ui_font, kanji_font)
 
 dragging_card = None
 # Main loop
@@ -130,21 +83,14 @@ while running:
         
     screen.fill((255, 255, 255))  # fill the screen with white
 
-    # draw deck
-    pygame.draw.rect(screen, (120,120,120), deck_rect)
-    pygame.draw.rect(screen, (0,0,0), deck_rect, 3)
-
-    # Draw enemy portrait background (red-ish)
-    pygame.draw.rect(screen, (200, 100, 100), enemy_rect)
-
-    # Draw enemy portrait border (black, thickness 3)
-    pygame.draw.rect(screen, (0, 0, 0), enemy_rect, 3)
+    # draw player slots+enemy slots
+    renderer.draw_board(board)
 
     # render enemy HP text
     enemy_hp_text = ui_font.render("25", True, (0, 0, 0))
 
     # make a little bubble rect left of enemy portrait
-    enemy_hp_bubble = pygame.Rect(enemy_rect.left-20, enemy_rect.centery+40, 70, 40)
+    enemy_hp_bubble = pygame.Rect(board.enemy_rect.left-20, board.enemy_rect.centery+40, 70, 40)
 
     # draw bubble
     pygame.draw.circle(screen, (255, 255, 255), enemy_hp_bubble.center,25)
@@ -154,17 +100,11 @@ while running:
     text_rect = enemy_hp_text.get_rect(center=enemy_hp_bubble.center)
     screen.blit(enemy_hp_text, text_rect)
 
-    # Draw player portrait background (blue-ish)
-    pygame.draw.rect(screen, (100, 100, 200), player_rect)
-
-    # Draw player portrait border
-    pygame.draw.rect(screen, (0, 0, 0), player_rect, 3)
-
     # render player HP text
     player_hp_text = ui_font.render("25", True, (0, 0, 0))
 
     # make a little bubble rect left of player portrait
-    player_hp_bubble = pygame.Rect(player_rect.left-20, player_rect.centery+40, 70, 40)
+    player_hp_bubble = pygame.Rect(board.player_rect.left-20, board.player_rect.centery+40, 70, 40)
 
     # draw bubble
     pygame.draw.circle(screen, (255, 255, 255), player_hp_bubble.center,25)
@@ -174,16 +114,6 @@ while running:
     text_rect = player_hp_text.get_rect(center=player_hp_bubble.center)
     screen.blit(player_hp_text, text_rect)
  
-    # draw player slots
-    for slot in player_slots:
-        pygame.draw.rect(screen, (200,200,200), slot.rect, 2)  # light gray border
-        if slot.card:
-            slot.card.draw(screen, kanji_font)
-
-    # draw enemy slots
-    for slot in enemy_slots:
-        pygame.draw.rect(screen, (200,200,200), slot.rect, 2)
-
 
     my_card.draw(screen,kanji_font)
     my_card2.draw(screen,kanji_font)
@@ -222,7 +152,7 @@ while running:
             if event.button == 1:  
 
                                 # click on deck
-                if deck_rect.collidepoint(event.pos):
+                if board.deck_rect.collidepoint(event.pos):
 
                     if len(player.deck) > 0:
 
@@ -244,14 +174,12 @@ while running:
                         dragging_card = player_card
 
                         # if this card was in a slot, empty that slot
-                        for slot in player_slots:
+                        for slot in board.player_slots:
                             if slot.card == dragging_card:
                                 slot.card = None
                         #print("Started dragging " + dragging_card.name)
                         break
                         # Start dragging this card
-
-                        
 
         # If the mouse is moved
         elif event.type == pygame.MOUSEMOTION: 
@@ -276,7 +204,7 @@ while running:
                     placed_in_slot = False  # track if we snapped it
 
                     # Try to place in a slot
-                    for slot in player_slots:
+                    for slot in board.player_slots:
                         if slot.rect.collidepoint(dragging_card.pos):
                              # only allow empty slots
                             if slot.card is None:
@@ -296,7 +224,7 @@ while running:
 
                     # 🔥 If NOT placed in any slot → remove from all slots
                     if not placed_in_slot:
-                        for slot in player_slots:
+                        for slot in board.player_slots:
                             if slot.card == dragging_card:
                                 slot.card = None
 
