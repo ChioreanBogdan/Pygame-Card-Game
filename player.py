@@ -2,14 +2,7 @@ from entity import Entity
 
 class Player(Entity):
     def __init__(self, name, hp=25):
-        super().__init__(hp)
-        self.name = name
-
-        # health
-        self.hp = hp
-
-        # future-proof
-        self.status_effects = []
+        super().__init__(name,hp)
 
         # game zones
         self.hand = []

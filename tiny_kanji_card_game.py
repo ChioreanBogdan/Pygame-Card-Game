@@ -23,9 +23,6 @@ turn_manager = TurnManager()
 WIDTH = 800
 HEIGHT = 600
 
-#Create board object
-board = Board(WIDTH,HEIGHT)
-
 #Made End Turn button rect
 end_turn_rect = pygame.Rect(WIDTH - 220, HEIGHT // 2 - 30, 140, 60)
 
@@ -43,6 +40,9 @@ dragging_card = None
 #Create 2 Player objects
 player = Player("Player")
 enemy = Player("Enemy")
+
+#Create board object
+board = Board(WIDTH,HEIGHT,player,enemy)
 
 # Draw one card
 #card_rect = pygame.Rect(100, 400, 80, 120)  # x, y, width, height
@@ -76,8 +76,8 @@ start_x = HAND_CENTER_X - (len(hand.cards) - 1) * spacing // 2
 max_angle = 30  # total spread
 
 #This is only for testing purposes and must be changed later
-player_cards.append(my_card)
-player_cards.append(my_card2)
+#player_cards.append(my_card)
+#player_cards.append(my_card2)
 
 while running:
         
@@ -85,38 +85,9 @@ while running:
 
     # draw player slots+enemy slots
     renderer.draw_board(board)
-
-    # render enemy HP text
-    enemy_hp_text = ui_font.render("25", True, (0, 0, 0))
-
-    # make a little bubble rect left of enemy portrait
-    enemy_hp_bubble = pygame.Rect(board.enemy_rect.left-20, board.enemy_rect.centery+40, 70, 40)
-
-    # draw bubble
-    pygame.draw.circle(screen, (255, 255, 255), enemy_hp_bubble.center,25)
-    pygame.draw.circle(screen, (0, 0, 0), enemy_hp_bubble.center,25, 2)
-
-    # center text in bubble
-    text_rect = enemy_hp_text.get_rect(center=enemy_hp_bubble.center)
-    screen.blit(enemy_hp_text, text_rect)
-
-    # render player HP text
-    player_hp_text = ui_font.render("25", True, (0, 0, 0))
-
-    # make a little bubble rect left of player portrait
-    player_hp_bubble = pygame.Rect(board.player_rect.left-20, board.player_rect.centery+40, 70, 40)
-
-    # draw bubble
-    pygame.draw.circle(screen, (255, 255, 255), player_hp_bubble.center,25)
-    pygame.draw.circle(screen, (0, 0, 0), player_hp_bubble.center,25, 2)
-
-    # center text in bubble
-    text_rect = player_hp_text.get_rect(center=player_hp_bubble.center)
-    screen.blit(player_hp_text, text_rect)
  
-
-    my_card.draw(screen,kanji_font)
-    my_card2.draw(screen,kanji_font)
+    #my_card.draw(screen,kanji_font)
+    #my_card2.draw(screen,kanji_font)
 
     mouse_pos = pygame.mouse.get_pos()
 
@@ -181,6 +152,11 @@ while running:
                         break
                         # Start dragging this card
 
+                #Check if mouse was inside "End turn" button rectangle
+                if board.end_turn_rect.collidepoint(event.pos):
+                    turn_manager.end_turn()
+                    print(f"Turn number = {turn_manager.current_turn}")
+
         # If the mouse is moved
         elif event.type == pygame.MOUSEMOTION: 
             #print("Mouse motion detected") 
@@ -235,6 +211,5 @@ while running:
 #screen.fill((255, 255, 255))  # fill the screen with white
 #my_card.draw(screen,font)
 #my_card2.draw(screen,font)
-
 
 pygame.display.flip()  # update the screen (otherwise what we draw appears only in memory,not on the screen)

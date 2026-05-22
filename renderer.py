@@ -27,18 +27,30 @@ class Renderer:
         pygame.draw.rect(self.screen, (100,100,200), board.player_rect)
         pygame.draw.rect(self.screen, (0,0,0), board.player_rect, 3)
 
-    # def draw_board(self, player_rect, enemy_rect, deck_rect):
-    #     # deck
-    #     pygame.draw.rect(self.screen, (120,120,120), deck_rect)
-    #     pygame.draw.rect(self.screen, (0,0,0), deck_rect, 3)
+        # render enemy HP text
+        enemy_hp_text = self.ui_font.render(str(board.enemy.hp), True, (0, 0, 0))
 
-    #     # enemy portrait
-    #     pygame.draw.rect(self.screen, (200,100,100), enemy_rect)
-    #     pygame.draw.rect(self.screen, (0,0,0), enemy_rect, 3)
+        # draw bubble
+        pygame.draw.circle(self.screen, (255, 255, 255), board.enemy_hp_bubble.center,25)
+        pygame.draw.circle(self.screen, (0, 0, 0), board.enemy_hp_bubble.center,25, 2)
 
-    #     # player portrait
-    #     pygame.draw.rect(self.screen, (100,100,200), player_rect)
-    #     pygame.draw.rect(self.screen, (0,0,0), player_rect, 3)
+        # center text in bubble
+        text_rect = enemy_hp_text.get_rect(center=board.enemy_hp_bubble.center)
+        self.screen.blit(enemy_hp_text, text_rect)
+
+        # render player HP text
+        player_hp_text = self.ui_font.render(str(board.player.hp), True, (0, 0, 0))
+
+        # draw bubble
+        pygame.draw.circle(self.screen, (255, 255, 255), board.player_hp_bubble.center,25)
+        pygame.draw.circle(self.screen, (0, 0, 0), board.player_hp_bubble.center,25, 2)
+
+        # center text in bubble
+        text_rect = player_hp_text.get_rect(center=board.player_hp_bubble.center)
+        self.screen.blit(player_hp_text, text_rect)
+
+        # draw end turn button between portraits
+        self.draw_end_turn_button(board.end_turn_rect)
 
     def draw_slots(self, slots):
         for slot in slots:
@@ -53,11 +65,11 @@ class Renderer:
         for card in cards:
             card.draw(self.screen, font)
 
-    def draw_end_turn_button(self, rect, font):
-        pygame.draw.rect(self.screen, (220,220,100), rect)
-        pygame.draw.rect(self.screen, (0,0,0), rect, 2)
+    def draw_end_turn_button(self, rect):
+        pygame.draw.rect(self.screen, (130,130,130), rect)
+        pygame.draw.rect(self.screen, (0,0,0), rect, 4)
 
-        text = self.font.render("End", True, (0,0,0))
+        text = self.ui_font.render("End Turn", True, (0,0,0))
         text_rect = text.get_rect(center=rect.center)
 
         self.screen.blit(text, text_rect)

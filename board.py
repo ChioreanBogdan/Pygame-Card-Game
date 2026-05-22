@@ -2,7 +2,14 @@ import pygame
 from slot import Slot
 
 class Board:
-    def __init__(self, width, height):
+    def __init__(self, width, height,player,enemy):
+
+        self.width = width
+        self.height = height
+
+        self.player = player
+        self.enemy = enemy
+
         self.player_slots = []
         self.enemy_slots = []
 
@@ -47,3 +54,16 @@ class Board:
         # player portrait rectangle
         self.player_rect = pygame.Rect(width - portrait_width - 30, height-portait_height-40, portrait_width, portait_height)
 
+        # make a little bubble rect left of enemy portrait
+        self.enemy_hp_bubble = pygame.Rect(self.enemy_rect.left-20, self.enemy_rect.centery+40, 70, 40)
+
+        # make a little bubble rect left of player portrait
+        self.player_hp_bubble = pygame.Rect(self.player_rect.left-20, self.player_rect.centery+40, 70, 40)
+
+        #Rect for end turn button position
+        self.end_turn_rect = pygame.Rect(
+            width -180,
+            height // 2 - 35,
+            150,
+            50
+                                        )
