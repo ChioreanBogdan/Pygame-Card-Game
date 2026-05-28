@@ -2,11 +2,9 @@ import pygame  # import the library
 from kanji import Kanji #import Kanji class
 
 class Card:
-    def __init__(self, kanji, cost, attack, hp, x, y, font):
+    def __init__(self, kanji, cost, x, y, font):
         self.kanji = kanji
         self.cost = cost
-        self.attack = attack
-        self.hp = hp
         
         # 🔥 Interaction box (used for clicking, dragging, slots)
         self.rect = pygame.Rect(x, y, 80, 120)

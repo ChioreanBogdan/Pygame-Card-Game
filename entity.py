@@ -2,4 +2,6 @@ class Entity:
     def __init__(self, name, hp):
         self.name = name
         self.hp = hp
+
         self.status_effects = []
+        self.abilities = []

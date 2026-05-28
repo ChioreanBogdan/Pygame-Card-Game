@@ -11,7 +11,7 @@ from board import Board
 
 pygame.init()  # initialize pygamefrom board import Board
 
-print("testing")
+print("testin")
 
 kanji_font = pygame.font.SysFont("MS Gothic", 48)  # None = default font, 48 = size
 ui_font = pygame.font.SysFont("Arial", 28)
