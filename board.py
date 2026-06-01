@@ -1,5 +1,6 @@
 import pygame
 from slot import Slot
+from card import Card #import Card class
 
 class Board:
     def __init__(self, width, height,player,enemy):
@@ -67,3 +68,32 @@ class Board:
             150,
             50
                                         )
+        
+    def start_drag(self, card):
+        self.dragging_card = card
+
+        # if in slot, temporarily free it
+        for slot in self.player_slots:
+            if slot.card == card:
+                slot.card = None
+
+    def release_drag(self, card, pos, hand):
+        placed = False
+
+        for slot in self.player_slots:
+            if slot.rect.collidepoint(pos) and slot.card is None:
+                slot.card = card
+                card.rect.center = slot.rect.center
+                placed = True
+                break
+
+        if not placed:
+            # snap back logic
+            if card in hand.cards:
+                card.pos = card.original_pos
+                card.rect.center = card.original_pos
+            else:
+                for slot in self.player_slots:
+                    if slot.card == card:
+                        card.rect.center = slot.rect.center
+                        break

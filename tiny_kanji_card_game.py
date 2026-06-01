@@ -46,9 +46,9 @@ board = Board(WIDTH,HEIGHT,player,enemy)
 
 # Draw one card
 #card_rect = pygame.Rect(100, 400, 80, 120)  # x, y, width, height
-my_card = Card(KANJI_DB["火"], 1, 1, 1, 100, 400, kanji_font)
+my_card = Card(KANJI_DB["火"], 1, 100, 400, kanji_font)
 
-my_card2 = Card(KANJI_DB["山"], 1, 1, 1, 180, 400, kanji_font)
+my_card2 = Card(KANJI_DB["山"], 1, 180, 400, kanji_font)
 
 running = True
 
@@ -58,9 +58,9 @@ player_hand_cards = []
 hand = Hand(player_hand_cards, WIDTH, HEIGHT)
 player_cards = []
 
-hand_for_card1 = Card(KANJI_DB["火"], 1, 1, 1, 100, 400, kanji_font)
-hand_for_card2 = Card(KANJI_DB["山"], 1, 1, 1, 100, 400, kanji_font)
-hand_for_card3 = Card(KANJI_DB["水"], 1, 1, 1, 100, 400, kanji_font)
+hand_for_card1 = Card(KANJI_DB["火"], 1, 100, 400, kanji_font)
+hand_for_card2 = Card(KANJI_DB["山"], 1, 100, 400, kanji_font)
+hand_for_card3 = Card(KANJI_DB["水"], 1, 100, 400, kanji_font)
 hand.cards.append(hand_for_card1)
 hand.cards.append(hand_for_card2)
 hand.cards.append(hand_for_card3)
@@ -130,26 +130,23 @@ while running:
                         card_name = player.deck.pop()
                         kanji_obj = KANJI_DB[card_name]
 
-                        new_card = Card(kanji_obj,1,1,1,200,400,kanji_font)
+                        new_card = Card(kanji_obj,1,200,400,kanji_font)
 
                         hand.cards.append(new_card)
 
                 # Check if the mouse click was inside the card's rectangle
                 for player_card in reversed(player_cards + hand.cards):
 
-                    hitbox = pygame.Rect(player_card.pos[0] - 40,
-                                        player_card.pos[1] - 60,
-                                        80, 120)
-
-                    if hitbox.collidepoint(event.pos):
+                    if player_card.rect.collidepoint(event.pos):
                         dragging_card = player_card
 
+                        dragging_card.old_slot = None
                         # if this card was in a slot, empty that slot
                         for slot in board.player_slots:
-                            if slot.card == dragging_card:
+                            if slot.card is dragging_card:
                                 slot.card = None
                         #print("Started dragging " + dragging_card.name)
-                        break
+                                break
                         # Start dragging this card
 
                 #Check if mouse was inside "End turn" button rectangle
@@ -183,26 +180,30 @@ while running:
                     for slot in board.player_slots:
                         if slot.rect.collidepoint(dragging_card.pos):
                              # only allow empty slots
-                            if slot.card is None:
-                                dragging_card.pos = slot.rect.center
-                                dragging_card.rect.center = slot.rect.center
-                                slot.card = dragging_card
+                            if slot.card is not None:
+                                continue
+                            
+                            dragging_card.pos = slot.rect.center
+                            dragging_card.rect.center = slot.rect.center
+                            slot.card = dragging_card
 
-                                # remove from hand so Hand.draw stops managing it
-                                if dragging_card in hand.cards:
-                                    hand.cards.remove(dragging_card)
+                            # remove from hand so Hand.draw stops managing it
+                            if dragging_card in hand.cards:
+                                hand.cards.remove(dragging_card)
 
-                                if dragging_card not in player_cards:
-                                    player_cards.append(dragging_card)
+                            if dragging_card not in player_cards:
+                                player_cards.append(dragging_card)
 
-                                placed_in_slot = True
+                            placed_in_slot = True
                             break
 
                     # 🔥 If NOT placed in any slot → remove from all slots
+                    
                     if not placed_in_slot:
-                        for slot in board.player_slots:
-                            if slot.card == dragging_card:
-                                slot.card = None
+                        if dragging_card.old_slot:
+                            dragging_card.old_slot.card = dragging_card
+                            dragging_card.pos = dragging_card.old_slot.rect.center
+                            dragging_card.rect.center = dragging_card.old_slot.rect.center
 
                 dragging_card = None
 

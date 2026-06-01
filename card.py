@@ -5,6 +5,9 @@ class Card:
     def __init__(self, kanji, cost, x, y, font):
         self.kanji = kanji
         self.cost = cost
+
+         #Remember starting position
+        self.original_pos = (x, y)
         
         # 🔥 Interaction box (used for clicking, dragging, slots)
         self.rect = pygame.Rect(x, y, 80, 120)
