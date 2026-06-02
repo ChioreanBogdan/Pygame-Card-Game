@@ -91,6 +91,7 @@ while running:
 
     mouse_pos = pygame.mouse.get_pos()
 
+    #print("DRAWING:", [c.kanji.symbol for c in player_cards])
     for card in player_cards:
         if card != dragging_card:   # don't double-draw dragged card
             card.draw(screen, kanji_font)
@@ -135,17 +136,23 @@ while running:
                         hand.cards.append(new_card)
 
                 # Check if the mouse click was inside the card's rectangle
-                for player_card in reversed(player_cards + hand.cards):
+                for player_card in (player_cards + hand.cards):
 
                     if player_card.rect.collidepoint(event.pos):
                         dragging_card = player_card
 
                         dragging_card.old_slot = None
+                        i=0
                         # if this card was in a slot, empty that slot
                         for slot in board.player_slots:
-                            if slot.card is dragging_card:
+                            #i=i+1
+                            #print("Slot["+str(i)+"] " + str(slot.card))
+                            if slot.card == dragging_card:
+                                print("Clearing slot index:", board.player_slots.index(slot))
                                 slot.card = None
-                        #print("Started dragging " + dragging_card.name)
+                                dragging_card.old_slot = slot
+                                #player_cards.remove(dragging_card)
+                        
                                 break
                         # Start dragging this card
 
@@ -173,6 +180,11 @@ while running:
             # Check if it was the left mouse button
             if event.button == 1:
                 if dragging_card:
+                    i=0
+                    # if this card was in a slot, empty that slot
+                    #for slot in board.player_slots:
+                       # i=i+1
+                        #print("Slot["+str(i)+"] " + str(slot.card))
 
                     placed_in_slot = False  # track if we snapped it
 
@@ -183,9 +195,13 @@ while running:
                             if slot.card is not None:
                                 continue
                             
-                            dragging_card.pos = slot.rect.center
-                            dragging_card.rect.center = slot.rect.center
-                            slot.card = dragging_card
+                            if slot.card is None:
+                                dragging_card.pos = slot.rect.center
+                                dragging_card.rect.center = slot.rect.center
+                                print("Assigning slot index:", board.player_slots.index(slot))
+                                slot.card = dragging_card
+                                print("Slot now contains:", slot.card.kanji.symbol)
+                                #print("Slot has " + str(slot.card.kanji))
 
                             # remove from hand so Hand.draw stops managing it
                             if dragging_card in hand.cards:
@@ -204,6 +220,10 @@ while running:
                             dragging_card.old_slot.card = dragging_card
                             dragging_card.pos = dragging_card.old_slot.rect.center
                             dragging_card.rect.center = dragging_card.old_slot.rect.center
+
+                for i, slot in enumerate(board.player_slots):
+                    print(i, slot.card.kanji.symbol if slot.card else "EMPTY")
+                    #print("player_cards:", [c.kanji.symbol for c in player_cards])
 
                 dragging_card = None
 
