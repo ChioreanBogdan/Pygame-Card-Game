@@ -8,6 +8,7 @@ from player import Player #import Player class
 from turn_manager import TurnManager #import TurnManager
 from renderer import Renderer
 from board import Board
+from card_popup import CardPopup
 
 pygame.init()  # initialize pygamefrom board import Board
 
@@ -43,6 +44,10 @@ enemy = Player("Enemy")
 
 #Create board object
 board = Board(WIDTH,HEIGHT,player,enemy)
+
+#Create CardPupup object
+popup = CardPopup()
+popup.active = True
 
 # Draw one card
 #card_rect = pygame.Rect(100, 400, 80, 120)  # x, y, width, height
@@ -85,6 +90,7 @@ while running:
 
     # draw player slots+enemy slots
     renderer.draw_board(board)
+    popup.draw(screen)
  
     #my_card.draw(screen,kanji_font)
     #my_card2.draw(screen,kanji_font)
