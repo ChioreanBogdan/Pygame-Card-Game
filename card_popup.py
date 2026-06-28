@@ -20,4 +20,8 @@ class CardPopup:
         if not self.active:
             return
 
-        pygame.draw.rect(screen, (200, 200, 200), (200, 100, 400, 300))
+        #Dark background
+        pygame.draw.rect(screen, (80, 80, 80), (150, 50, 500, 500))
+
+        #Border
+        pygame.draw.rect(screen, (20, 20, 20), (150, 50, 500, 500),4)
